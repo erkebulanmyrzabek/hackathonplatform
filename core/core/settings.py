@@ -15,10 +15,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app',
     'aiogram.contrib.fsm_storage.redis',
     'rest_framework',
     'rest_framework.authtoken',
+    'user',
+    'feed',
+    'shop',
 ]
 
 MIDDLEWARE = [
@@ -84,3 +86,5 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+TOKEN = '7960542844:AAH2nSW1Zq7BH24OnRcgoepI8jX2LQ8e-Gg'
