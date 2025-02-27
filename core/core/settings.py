@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,6 +22,8 @@ INSTALLED_APPS = [
     'user',
     'feed',
     'shop',
+    'community',
+    'hackathon',
 ]
 
 MIDDLEWARE = [
@@ -88,3 +91,8 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 TOKEN = '7960542844:AAH2nSW1Zq7BH24OnRcgoepI8jX2LQ8e-Gg'
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),  # Говорим Django искать статику в static/
+]

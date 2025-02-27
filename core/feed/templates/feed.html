@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hackathon App</title>
+    <link rel="stylesheet" href={% static 'css/styles.css'%}>
+</head>
+<body>
+    <header>
+        <div class="profile">
+            <img src={%static 'img/oralbek.jpg' %} alt="Аватар">
+            <span>{{user.name}}</span>
+        </div>
+        <div class="notifications">
+            <img src="icons/notifications.svg" alt="Уведомления">
+        </div>
+    </header>
+    
+
+    <main>
+        <section>
+            <h2>Новости</h2>
+            <div class="scroll-container">
+                <div class="grid-item"><img src="img/news1.jpg" alt="Новость 1"></div>
+                <div class="grid-item"><img src="img/news2.jpg" alt="Новость 2"></div>
+                <div class="grid-item"><img src="img/news3.jpg" alt="Новость 3"></div>
+                <div class="grid-item"><img src="img/news4.jpg" alt="Новость 4"></div>
+            </div>
+        </section>
+    
+        <section>
+            <h2>Хакатоны</h2>
+            <div class="scroll-container">
+                <div class="grid-item"><img src="img/hackathon1.jpg" alt="Хакатон 1"></div>
+                <div class="grid-item"><img src="img/hackathon2.jpg" alt="Хакатон 2"></div>
+                <div class="grid-item"><img src="img/hackathon3.jpg" alt="Хакатон 3"></div>
+                <div class="grid-item"><img src="img/hackathon4.jpg" alt="Хакатон 4"></div>
+            </div>
+        </section>
+    
+        <section>
+            <h2>Кейс-чемпионаты</h2>
+            <div class="scroll-container">
+                <div class="grid-item"><img src="img/case1.jpg" alt="Кейс 1"></div>
+                <div class="grid-item"><img src="img/case2.jpg" alt="Кейс 2"></div>
+                <div class="grid-item"><img src="img/case3.jpg" alt="Кейс 3"></div>
+                <div class="grid-item"><img src="img/case4.jpg" alt="Кейс 4"></div>
+            </div>
+        </section>
+    </main>
+    
+
+    <nav class="bottom-nav">
+        <a href="#home" class="nav-item active">
+            <img src={% static 'img/home.svg'%} alt="Главная">
+            <span>Главная</span>
+        </a>
+        <a href="#hackathons" class="nav-item">
+            <img src={% static 'img/hackathon.svg'%} alt="Хакатоны">
+            <span>Хакатоны</span>
+        </a>
+        <a href="#shop" class="nav-item">
+            <img src={% static 'img/shop.svg'%} alt="Магазин">
+            <span>Магазин</span>
+        </a>
+        <a href="#rating" class="nav-item">
+            <img src={% static 'img/leaderboard.svg'%} alt="Рейтинг">
+            <span>Рейтинг</span>
+        </a>
+        <a href="#profile" class="nav-item">
+            <img src={% static 'img/profile.svg'%} alt="Профиль">
+            <span>Профиль</span>
+        </a>
+    </nav>
+    
+    <script src={% static 'js/script.js'%}></script>
+</body>
+</html>
