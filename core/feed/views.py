@@ -3,6 +3,7 @@ from user.models import User
 from feed.models import Post, Webinar, Casecup
 from django.shortcuts import render, get_object_or_404
 from hackathon.models import Hackathon
+from .models import Event
 
 
 def feed_view(request):
@@ -14,13 +15,15 @@ def feed_view(request):
     hackathons = Hackathon.objects.all()
     webinars = Webinar.objects.all()
     casecups = Casecup.objects.all()
+    events = Event.objects.all()
 
     context = {
         'user': user,
         'posts': posts,
         'hackathons': hackathons,
         'webinars': webinars,
-        'casecups': casecups
+        'casecups': casecups,
+        'events': events
     }
     return render(request, 'feed.html', context)
 

@@ -1,6 +1,8 @@
 from django.db import models
 from user.models import User
 
+
+
 # Create your models here.
 class Team(models.Model):
     name = models.CharField(max_length=100)

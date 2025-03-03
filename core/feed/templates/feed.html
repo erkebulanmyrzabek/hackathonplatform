@@ -4,77 +4,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hackathon App</title>
-    <link rel="stylesheet" href={% static 'css/styles.css'%}>
+    <title>Платформа хакатонов</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-    <header>
-        <div class="profile">
-            <img src={%static 'img/oralbek.jpg' %} alt="Аватар">
-            <span>{{user.name}}</span>
-        </div>
-        <div class="notifications">
-            <img src="icons/notifications.svg" alt="Уведомления">
-        </div>
-    </header>
-    
+    <div class="app-container">
+        <!-- Верхняя панель с аватаром, именем пользователя и уведомлениями -->
+        <header class="header">
+            <div class="user-info">
+                <div class="avatar" id="userAvatar"></div>
+                <span class="username" id="userName">{{ user.get_full_name }}</span>
+            </div>
+            <div class="notification-icon" id="notificationIcon">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge" id="notificationBadge">0</span>
+            </div>
+        </header>
 
-    <main>
-        <section>
-            <h2>Новости</h2>
-            <div class="scroll-container">
-                <div class="grid-item"><img src="img/news1.jpg" alt="Новость 1"></div>
-                <div class="grid-item"><img src="img/news2.jpg" alt="Новость 2"></div>
-                <div class="grid-item"><img src="img/news3.jpg" alt="Новость 3"></div>
-                <div class="grid-item"><img src="img/news4.jpg" alt="Новость 4"></div>
+        <!-- Центральная часть - лента событий -->
+        <main class="content">
+            <h1>Предстоящие события</h1>
+            
+            <!-- Фильтры -->
+            <div class="filters" id="filters">
+                <button class="active" data-filter="all">Все</button>
+                <button data-filter="hackathon">Хакатоны</button>
+                <button data-filter="casecup">Кейс-чемпионаты</button>
+                <button data-filter="webinar">Вебинары</button>
             </div>
-        </section>
-    
-        <section>
-            <h2>Хакатоны</h2>
-            <div class="scroll-container">
-                <div class="grid-item"><img src="img/hackathon1.jpg" alt="Хакатон 1"></div>
-                <div class="grid-item"><img src="img/hackathon2.jpg" alt="Хакатон 2"></div>
-                <div class="grid-item"><img src="img/hackathon3.jpg" alt="Хакатон 3"></div>
-                <div class="grid-item"><img src="img/hackathon4.jpg" alt="Хакатон 4"></div>
-            </div>
-        </section>
-    
-        <section>
-            <h2>Кейс-чемпионаты</h2>
-            <div class="scroll-container">
-                <div class="grid-item"><img src="img/case1.jpg" alt="Кейс 1"></div>
-                <div class="grid-item"><img src="img/case2.jpg" alt="Кейс 2"></div>
-                <div class="grid-item"><img src="img/case3.jpg" alt="Кейс 3"></div>
-                <div class="grid-item"><img src="img/case4.jpg" alt="Кейс 4"></div>
-            </div>
-        </section>
-    </main>
-    
 
-    <nav class="bottom-nav">
-        <a href="#home" class="nav-item active">
-            <img src={% static 'img/home.svg'%} alt="Главная">
-            <span>Главная</span>
-        </a>
-        <a href="#hackathons" class="nav-item">
-            <img src={% static 'img/hackathon.svg'%} alt="Хакатоны">
-            <span>Хакатоны</span>
-        </a>
-        <a href="#shop" class="nav-item">
-            <img src={% static 'img/shop.svg'%} alt="Магазин">
-            <span>Магазин</span>
-        </a>
-        <a href="#rating" class="nav-item">
-            <img src={% static 'img/leaderboard.svg'%} alt="Рейтинг">
-            <span>Рейтинг</span>
-        </a>
-        <a href="#profile" class="nav-item">
-            <img src={% static 'img/profile.svg'%} alt="Профиль">
-            <span>Профиль</span>
-        </a>
-    </nav>
-    
-    <script src={% static 'js/script.js'%}></script>
+            <!-- Карточки событий -->
+            <div class="events-list" id="eventsList">
+                <!-- Хакатоны -->
+                {% for hackathon in hackathons %}
+                <div class="event-card" data-type="hackathon">
+                    <div class="event-image">
+                        {% if hackathon.image %}
+                            <img src="{{ hackathon.image.url }}" alt="{{ hackathon.name }}">
+                        {% endif %}
+                        <div class="event-type">Хакатон</div>
+                    </div>
+                    <div class="event-info">
+                        <h2 class="event-title">{{ hackathon.name }}</h2>
+                        <div class="event-date">
+                            <i class="fas fa-calendar"></i>
+                            <span class="date-text">{{ hackathon.start_date|date:"d.m.Y" }} - {{ hackathon.end_date|date:"d.m.Y" }}</span>
+                        </div>
+                        <div class="event-description">
+                            {{ hackathon.description|truncatewords:20 }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <!-- Кейс-чемпионаты -->
+                {% for casecup in casecups %}
+                <div class="event-card" data-type="casecup">
+                    <div class="event-image">
+                        {% if casecup.image %}
+                            <img src="{{ casecup.image.url }}" alt="{{ casecup.name }}">
+                        {% endif %}
+                        <div class="event-type">Кейс-чемпионат</div>
+                    </div>
+                    <div class="event-info">
+                        <h2 class="event-title">{{ casecup.name }}</h2>
+                        <div class="event-date">
+                            <i class="fas fa-calendar"></i>
+                            <span class="date-text">{{ casecup.start_date|date:"d.m.Y" }} - {{ casecup.end_date|date:"d.m.Y" }}</span>
+                        </div>
+                        <div class="event-description">
+                            {{ casecup.description|truncatewords:20 }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <!-- Вебинары -->
+                {% for webinar in webinars %}
+                <div class="event-card" data-type="webinar">
+                    <div class="event-image">
+                        {% if webinar.image %}
+                            <img src="{{ webinar.image.url }}" alt="{{ webinar.name }}">
+                        {% endif %}
+                        <div class="event-type">Вебинар</div>
+                    </div>
+                    <div class="event-info">
+                        <h2 class="event-title">{{ webinar.name }}</h2>
+                        <div class="event-date">
+                            <i class="fas fa-calendar"></i>
+                            <span class="date-text">{{ webinar.start_date|date:"d.m.Y" }} - {{ webinar.end_date|date:"d.m.Y" }}</span>
+                        </div>
+                        <div class="event-description">
+                            {{ webinar.description|truncatewords:20 }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                {% if not hackathons and not casecups and not webinars %}
+                <div class="no-events">
+                    <p>Нет предстоящих мероприятий</p>
+                </div>
+                {% endif %}
+            </div>
+        </main>
+
+        <!-- Нижняя навигационная панель -->
+        <nav class="bottom-nav">
+            <a href="/?hash={{ user.hash_code }}" class="nav-item active" data-nav="main">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </a>
+            <a href="/hackathons/?hash={{ user.hash_code }}" class="nav-item" data-nav="hackathons">
+                <i class="fas fa-laptop-code"></i>
+                <span>Хакатоны</span>
+            </a>
+            <a href="/shop/?hash={{ user.hash_code }}" class="nav-item" data-nav="shop">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Магазин</span>
+            </a>
+            <a href="/rating/?hash={{ user.hash_code }}" class="nav-item" data-nav="rating">
+                <i class="fas fa-trophy"></i>
+                <span>Рейтинг</span>
+            </a>
+            <a href="/profile/?hash={{ user.hash_code }}" class="nav-item" data-nav="profile">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        // Фильтрация событий
+        document.getElementById('filters').addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON') {
+                // Убираем активный класс у всех кнопок
+                this.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                // Добавляем активный класс нажатой кнопке
+                e.target.classList.add('active');
+
+                const filter = e.target.dataset.filter;
+                const events = document.querySelectorAll('.event-card');
+
+                events.forEach(event => {
+                    if (filter === 'all' || event.dataset.type === filter) {
+                        event.style.display = 'block';
+                    } else {
+                        event.style.display = 'none';
+                    }
+                });
+
+                // Показываем/скрываем сообщение об отсутствии событий
+                const visibleEvents = document.querySelectorAll('.event-card[style="display: block"]');
+                const noEvents = document.querySelector('.no-events');
+                if (visibleEvents.length === 0) {
+                    noEvents.style.display = 'block';
+                } else {
+                    noEvents.style.display = 'none';
+                }
+            }
+        });
+
+        // Навигация
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+
+    <style>
+        /* Добавляем стили для ссылок в навигации */
+        .nav-item {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .bottom-nav a {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            color: #666;
+            text-decoration: none;
+        }
+        
+        .bottom-nav a.active {
+            color: #007bff;
+        }
+    </style>
 </body>
 </html>
