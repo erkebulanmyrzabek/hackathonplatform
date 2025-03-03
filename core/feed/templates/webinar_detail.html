@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ webinar.name }} - BAITC | RedOrda{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Хлебные крошки -->
+    <nav class="flex" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a href="{% url 'feed' %}{% if user %}?hash={{ user.hash_code }}{% endif %}" 
+                   class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+                    </svg>
+                    Главная
+                </a>
+            </li>
+            <li aria-current="page">
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">{{ webinar.name }}</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Основная информация -->
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <!-- Изображение вебинара -->
+        <div class="aspect-video w-full">
+            {% if webinar.image %}
+            <img src="{{ webinar.image.url }}" alt="{{ webinar.name }}" class="w-full h-full object-cover">
+            {% else %}
+            <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                <svg class="w-24 h-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Контент -->
+        <div class="p-6">
+            <!-- Заголовок и статус -->
+            <div class="flex items-start justify-between mb-4">
+                <h1 class="text-2xl font-bold text-gray-900">{{ webinar.name }}</h1>
+                <div>
+                    {% if webinar.is_registration_open %}
+                    <span class="px-3 py-1 text-sm bg-green-500 text-white rounded-full">Регистрация открыта</span>
+                    {% else %}
+                    <span class="px-3 py-1 text-sm bg-gray-500 text-white rounded-full">Регистрация закрыта</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Основная информация -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Регистрация</h3>
+                        <p class="mt-1 text-sm text-gray-900">
+                            {{ webinar.start_registration|date:"d.m.Y" }} - {{ webinar.end_registration|date:"d.m.Y" }}
+                        </p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Проведение</h3>
+                        <p class="mt-1 text-sm text-gray-900">
+                            {{ webinar.start_date|date:"d.m.Y" }} - {{ webinar.end_date|date:"d.m.Y" }}
+                        </p>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Участники</h3>
+                        <p class="mt-1 text-sm text-gray-900">{{ webinar.participants_count }} / {{ webinar.max_participants }}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Категория</h3>
+                        <p class="mt-1 text-sm text-gray-900">{{ webinar.cat.name }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Описание -->
+            <div class="prose max-w-none">
+                {{ webinar.description|linebreaks }}
+            </div>
+
+            <!-- Кнопки действий -->
+            <div class="mt-6 flex flex-col sm:flex-row gap-4">
+                {% if webinar.is_registration_open %}
+                    {% if user in webinar.participants.all %}
+                    <span class="btn-secondary flex-1 text-center cursor-not-allowed">Вы уже зарегистрированы</span>
+                    {% else %}
+                    <a href="{% url 'webinar_register' webinar.id %}?hash={{ user.hash_code }}" 
+                       class="btn-primary flex-1 text-center">
+                        Зарегистрироваться
+                    </a>
+                    {% endif %}
+                {% else %}
+                    {% if webinar.participants_count >= webinar.max_participants %}
+                    <span class="btn-secondary flex-1 text-center cursor-not-allowed">Нет свободных мест</span>
+                    {% else %}
+                    <span class="btn-secondary flex-1 text-center cursor-not-allowed">Регистрация закрыта</span>
+                    {% endif %}
+                {% endif %}
+                <a href="{% url 'feed' %}{% if user %}?hash={{ user.hash_code }}{% endif %}" 
+                   class="btn-secondary flex-1 text-center">
+                    Вернуться к списку
+                </a>
+            </div>
+
+            {% if messages %}
+            <div class="mt-4">
+                {% for message in messages %}
+                <div class="p-4 {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-blue-100 text-blue-700{% endif %} rounded-lg">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ hackathon.title }} - BAITC | RedOrda{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Хлебные крошки -->
+    <nav class="flex" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a href="{% url 'hackathon:index' %}{% if user %}?hash={{ user.hash_code }}{% endif %}" 
+                   class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+                    </svg>
+                    Хакатоны
+                </a>
+            </li>
+            <li aria-current="page">
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">{{ hackathon.title }}</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Основная информация -->
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <!-- Изображение хакатона -->
+        <div class="aspect-video w-full">
+            {% if hackathon.image %}
+            <img src="{{ hackathon.image.url }}" alt="{{ hackathon.title }}" class="w-full h-full object-cover">
+            {% else %}
+            <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                <svg class="w-24 h-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Контент -->
+        <div class="p-6">
+            <!-- Заголовок и статус -->
+            <div class="flex items-start justify-between mb-4">
+                <h1 class="text-2xl font-bold text-gray-900">{{ hackathon.title }}</h1>
+                <div>
+                    {% if hackathon.is_registration_open %}
+                    <span class="px-3 py-1 text-sm bg-green-500 text-white rounded-full">Регистрация открыта</span>
+                    {% elif hackathon.is_active %}
+                    <span class="px-3 py-1 text-sm bg-blue-500 text-white rounded-full">Проходит</span>
+                    {% elif hackathon.is_finished %}
+                    <span class="px-3 py-1 text-sm bg-gray-500 text-white rounded-full">Завершен</span>
+                    {% else %}
+                    <span class="px-3 py-1 text-sm bg-yellow-500 text-white rounded-full">Скоро</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Основная информация -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Регистрация</h3>
+                        <p class="mt-1 text-sm text-gray-900">
+                            {{ hackathon.start_registration|date:"d.m.Y" }} - {{ hackathon.end_registration|date:"d.m.Y" }}
+                        </p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Проведение</h3>
+                        <p class="mt-1 text-sm text-gray-900">
+                            {{ hackathon.start_hackathon|date:"d.m.Y" }} - {{ hackathon.end_hackathon|date:"d.m.Y" }}
+                        </p>
+                    </div>
+                    {% if hackathon.prize_pool %}
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Призовой фонд</h3>
+                        <p class="mt-1 text-sm text-gray-900">{{ hackathon.prize_pool }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Участники</h3>
+                        <p class="mt-1 text-sm text-gray-900">{{ hackathon.participants_count }} человек</p>
+                    </div>
+                    {% if hackathon.tags.exists %}
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500">Теги</h3>
+                        <div class="mt-1 flex flex-wrap gap-2">
+                            {% for tag in hackathon.tags.all %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                {{ tag.name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Описание -->
+            <div class="prose max-w-none">
+                {{ hackathon.description|linebreaks }}
+            </div>
+
+            <!-- Кнопки действий -->
+            <div class="mt-6 flex flex-col sm:flex-row gap-4">
+                {% if hackathon.is_registration_open %}
+                <a href="#" class="btn-primary flex-1 text-center">Зарегистрироваться</a>
+                {% endif %}
+                <a href="{% url 'hackathon:index' %}{% if user %}?hash={{ user.hash_code }}{% endif %}" 
+                   class="btn-secondary flex-1 text-center">
+                    Вернуться к списку
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if hackathon.is_active or hackathon.is_finished %}
+    <!-- Результаты -->
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Результаты</h2>
+        {% if hackathon.winners %}
+        <div class="space-y-4">
+            {% for winner in hackathon.winners %}
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        {% if winner.place == 1 %}
+                        <span class="text-2xl">🥇</span>
+                        {% elif winner.place == 2 %}
+                        <span class="text-2xl">🥈</span>
+                        {% elif winner.place == 3 %}
+                        <span class="text-2xl">🥉</span>
+                        {% endif %}
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">{{ winner.team_name }}</div>
+                        <div class="text-sm text-gray-500">{{ winner.project_name }}</div>
+                    </div>
+                </div>
+                <div class="text-sm text-gray-500">
+                    {{ winner.prize }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-500">Результаты пока не объявлены</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 
