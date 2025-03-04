@@ -48,6 +48,34 @@
     </a>
     {% endfor %}
 
+    <div class="events-list" id="eventsList">
+        <!-- Хакатоны -->
+        {% for post in posts %}
+        <a href="/post/{{ post.id }}/?hash={{ user.hash_code }}" class="event-card-link">
+            <div class="event-card" data-type="post">
+                <div class="event-image">
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" alt="{{ post.header }}">
+                    {% else %}
+                        <div class="placeholder-image">
+                            <i class="fas fa-laptop-code"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="event-info">
+                    <h2 class="event-title">{{ post.header }}</h2>
+                    <div class="event-description">
+                        {{ post.body|truncatewords:50 }}
+                    </div>
+                    <div class="event-date">
+                        <i class="fas fa-calendar"></i>
+                        <span class="date-text">{{ post.created_at|date:"d.m.Y" }}</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+
     <!-- Кейс-чемпионаты -->
     {% for casecup in casecups %}
     <a href="/feed/casecup/{{ casecup.id }}/?hash={{ user.hash_code }}" class="event-card-link">

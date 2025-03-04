@@ -20,6 +20,7 @@ def feed_view(request):
 
     # Базовый QuerySet для хакатонов
     hackathons = Hackathon.objects.all()
+    posts = Post.objects.all()
 
     # Применяем поиск по названию и описанию
     if search_query:
