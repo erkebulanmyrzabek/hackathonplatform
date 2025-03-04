@@ -1,0 +1,366 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Заказ #{{ order.id }} | BAITC | RedOrda{% endblock %}
+
+{% block extra_css %}
+<style>
+    .order-detail-container {
+        padding-bottom: 40px;
+    }
+    
+    .order-card {
+        background-color: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .order-title {
+        font-size: 18px;
+        font-weight: 600;
+    }
+    
+    .order-status {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+    }
+    
+    .status-pending {
+        background-color: #fef3c7;
+        color: #d97706;
+    }
+    
+    .status-processing {
+        background-color: #e0f2fe;
+        color: #0284c7;
+    }
+    
+    .status-shipped {
+        background-color: #dcfce7;
+        color: #16a34a;
+    }
+    
+    .status-delivered {
+        background-color: #bbf7d0;
+        color: #16a34a;
+    }
+    
+    .status-cancelled {
+        background-color: #fee2e2;
+        color: #ef4444;
+    }
+    
+    .order-info-section {
+        margin-bottom: 16px;
+    }
+    
+    .section-title {
+        font-weight: 600;
+        margin-bottom: 12px;
+        font-size: 16px;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 16px;
+    }
+    
+    .info-item {
+        margin-bottom: 12px;
+    }
+    
+    .info-label {
+        font-size: 12px;
+        color: #6b7280;
+        margin-bottom: 4px;
+    }
+    
+    .info-value {
+        font-size: 14px;
+        font-weight: 500;
+    }
+    
+    .crystal-badge {
+        display: inline-flex;
+        align-items: center;
+        color: #4f46e5;
+        font-weight: 600;
+    }
+    
+    .crystal-icon {
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+    }
+    
+    .order-items {
+        margin-top: 24px;
+    }
+    
+    .order-item {
+        display: flex;
+        padding: 12px 0;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .order-item:last-child {
+        border-bottom: none;
+    }
+    
+    .item-image {
+        width: 70px;
+        height: 70px;
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: #f3f4f6;
+    }
+    
+    .item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .item-details {
+        flex: 1;
+        padding-left: 16px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .item-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+    
+    .item-variant {
+        font-size: 14px;
+        color: #6b7280;
+    }
+    
+    .item-price {
+        margin-top: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .price-info {
+        display: flex;
+        align-items: center;
+    }
+    
+    .item-quantity {
+        color: #6b7280;
+        margin-left: 8px;
+    }
+    
+    .order-totals {
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+    
+    .total-label {
+        color: #6b7280;
+    }
+    
+    .final-total {
+        font-weight: 700;
+        font-size: 18px;
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .back-button {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 8px;
+        background-color: #2563eb;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin-top: 16px;
+    }
+    
+    .back-button:hover {
+        background-color: #1d4ed8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="order-detail-container">
+    <div class="flex items-center mb-6">
+        <a href="{% url 'shop:orders' %}?hash={{ user.hash_code }}" class="text-gray-500 hover:text-gray-700 mr-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+        </a>
+        <h1 class="text-2xl font-bold">Заказ #{{ order.id }}</h1>
+    </div>
+    
+    <div class="order-card">
+        <div class="order-header">
+            <div class="order-title">Информация о заказе</div>
+            <span class="order-status status-{{ order.status }}">
+                {{ order.get_status_display }}
+            </span>
+        </div>
+        
+        <div class="order-info-section">
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Дата заказа</div>
+                    <div class="info-value">{{ order.created_at|date:"d.m.Y H:i" }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Способ оплаты</div>
+                    <div class="info-value">{{ order.get_payment_type_display }}</div>
+                </div>
+                
+                {% if order.tracking_number %}
+                <div class="info-item">
+                    <div class="info-label">Номер отслеживания</div>
+                    <div class="info-value">{{ order.tracking_number }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="order-info-section">
+            <div class="section-title">Данные получателя</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">ФИО</div>
+                    <div class="info-value">{{ order.full_name }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Телефон</div>
+                    <div class="info-value">{{ order.phone_number }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">{{ order.email }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="order-info-section">
+            <div class="section-title">Адрес доставки</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Город</div>
+                    <div class="info-value">{{ order.city }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Адрес</div>
+                    <div class="info-value">{{ order.address }}</div>
+                </div>
+                
+                {% if order.postal_code %}
+                <div class="info-item">
+                    <div class="info-label">Почтовый индекс</div>
+                    <div class="info-value">{{ order.postal_code }}</div>
+                </div>
+                {% endif %}
+                
+                <div class="info-item">
+                    <div class="info-label">Страна</div>
+                    <div class="info-value">{{ order.country }}</div>
+                </div>
+            </div>
+        </div>
+        
+        {% if order.notes %}
+        <div class="order-info-section">
+            <div class="section-title">Примечания к заказу</div>
+            <div class="info-value">{{ order.notes }}</div>
+        </div>
+        {% endif %}
+        
+        <div class="order-items">
+            <div class="section-title">Товары</div>
+            
+            {% for item in order_items %}
+            <div class="order-item">
+                <div class="item-image">
+                    <img src="{{ item.product.image.url }}" alt="{{ item.product_name }}">
+                </div>
+                <div class="item-details">
+                    <h3 class="item-title">{{ item.product_name }}</h3>
+                    {% if item.product_variant %}
+                    <div class="item-variant">{{ item.product_variant }}</div>
+                    {% endif %}
+                    <div class="item-price">
+                        <div class="price-info">
+                            <span>{{ item.price }} ₸</span>
+                            <span class="item-quantity">x{{ item.quantity }}</span>
+                        </div>
+                        <span>{{ item.total_price }} ₸</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <div class="order-totals">
+                <div class="total-row">
+                    <span class="total-label">Товары ({{ order_items.count }})</span>
+                    <span>{{ order.total_price }} ₸</span>
+                </div>
+                
+                {% if order.payment_type == 'crystals' %}
+                <div class="total-row">
+                    <span class="total-label">Кристаллы</span>
+                    <span class="crystal-badge">
+                        <img src="{% static 'img/icons/crystal.png' %}" alt="Crystal" class="crystal-icon">
+                        {{ order.total_crystal_price }}
+                    </span>
+                </div>
+                {% endif %}
+                
+                <div class="total-row">
+                    <span class="total-label">Доставка</span>
+                    <span>{{ order.shipping_cost }} ₸</span>
+                </div>
+                
+                <div class="total-row final-total">
+                    <span>Итого:</span>
+                    <span>{{ order.total_price }} ₸</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <a href="{% url 'shop:orders' %}?hash={{ user.hash_code }}" class="back-button">
+        Вернуться к списку заказов
+    </a>
+</div>
+{% endblock %} 

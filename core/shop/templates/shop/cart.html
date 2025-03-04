@@ -1,0 +1,402 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Корзина | BAITC | RedOrda{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Стили для корзины */
+    .cart-container {
+        padding-bottom: 120px;
+    }
+    
+    .cart-item {
+        display: flex;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 16px 0;
+    }
+    
+    .item-image {
+        width: 80px;
+        height: 80px;
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: #f3f4f6;
+    }
+    
+    .item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .item-details {
+        flex: 1;
+        padding-left: 16px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .item-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+    
+    .item-variant {
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 8px;
+    }
+    
+    .item-price {
+        display: flex;
+        align-items: center;
+        margin-top: auto;
+    }
+    
+    .price-money {
+        font-weight: 600;
+        color: #ef4444;
+    }
+    
+    .crystal-price {
+        display: flex;
+        align-items: center;
+        color: #4f46e5;
+        font-weight: 600;
+        margin-left: 12px;
+    }
+    
+    .crystal-icon {
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+    }
+    
+    .item-actions {
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+    }
+    
+    .quantity-selector {
+        display: flex;
+        align-items: center;
+    }
+    
+    .quantity-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background-color: #f3f4f6;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+    
+    .quantity-btn:hover {
+        background-color: #e5e7eb;
+    }
+    
+    .quantity-input {
+        width: 40px;
+        text-align: center;
+        font-weight: 600;
+        border: none;
+        outline: none;
+    }
+    
+    .remove-item {
+        margin-left: 12px;
+        color: #6b7280;
+        transition: all 0.3s ease;
+    }
+    
+    .remove-item:hover {
+        color: #ef4444;
+    }
+    
+    .cart-summary {
+        background-color: white;
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+    
+    .summary-label {
+        color: #6b7280;
+    }
+    
+    .summary-value {
+        font-weight: 600;
+    }
+    
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .total-label {
+        font-weight: 600;
+        font-size: 18px;
+    }
+    
+    .total-value {
+        font-weight: 700;
+        font-size: 18px;
+        color: #ef4444;
+    }
+    
+    .checkout-btn {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        background-color: #2563eb;
+        color: white;
+        font-weight: 600;
+        text-align: center;
+        margin-top: 20px;
+        transition: all 0.3s ease;
+    }
+    
+    .checkout-btn:hover {
+        background-color: #1d4ed8;
+    }
+    
+    .empty-cart {
+        text-align: center;
+        padding: 40px 0;
+    }
+    
+    .empty-cart-icon {
+        font-size: 64px;
+        color: #d1d5db;
+        margin-bottom: 16px;
+    }
+    
+    .empty-cart-text {
+        font-size: 18px;
+        color: #6b7280;
+        margin-bottom: 24px;
+    }
+    
+    .continue-shopping {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 8px;
+        background-color: #2563eb;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .continue-shopping:hover {
+        background-color: #1d4ed8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cart-container">
+    <h1 class="text-2xl font-bold mb-4">Корзина</h1>
+    
+    {% if cart and cart_items %}
+        <div class="cart-items">
+            {% for item in cart_items %}
+            <div class="cart-item" data-item-id="{{ item.id }}">
+                <div class="item-image">
+                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                </div>
+                <div class="item-details">
+                    <h3 class="item-title">{{ item.product.name }}</h3>
+                    {% if item.variant %}
+                    <div class="item-variant">
+                        {{ item.variant.variant_type|capfirst }}: {{ item.variant.value }}
+                    </div>
+                    {% endif %}
+                    <div class="item-price">
+                        <span class="price-money">{{ item.product.discounted_price }} ₸</span>
+                        {% if item.product.crystal_price > 0 %}
+                        <span class="crystal-price">
+                            <img src="{% static 'img/icons/crystal.png' %}" alt="Crystal" class="crystal-icon">
+                            {{ item.product.discounted_crystal_price }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <div class="quantity-selector">
+                        <button class="quantity-btn decrease-qty">-</button>
+                        <input type="number" class="quantity-input" value="{{ item.quantity }}" min="1" max="10">
+                        <button class="quantity-btn increase-qty">+</button>
+                    </div>
+                    <button class="remove-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="cart-summary">
+            <div class="summary-row">
+                <span class="summary-label">Товаров ({{ cart.total_items }})</span>
+                <span class="summary-value">{{ cart.total_price }} ₸</span>
+            </div>
+            {% if cart.total_crystal_price > 0 %}
+            <div class="summary-row">
+                <span class="summary-label">Кристаллы</span>
+                <span class="summary-value">
+                    <span class="crystal-price">
+                        <img src="{% static 'img/icons/crystal.png' %}" alt="Crystal" class="crystal-icon">
+                        {{ cart.total_crystal_price }}
+                    </span>
+                </span>
+            </div>
+            {% endif %}
+            <div class="total-row">
+                <span class="total-label">Итого:</span>
+                <span class="total-value">{{ cart.total_price }} ₸</span>
+            </div>
+            
+            <a href="{% url 'shop:checkout' %}?hash={{ user.hash_code }}" class="checkout-btn">
+                Оформить заказ
+            </a>
+        </div>
+    {% else %}
+        <div class="empty-cart">
+            <div class="empty-cart-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                </svg>
+            </div>
+            <p class="empty-cart-text">Ваша корзина пуста</p>
+            <a href="{% url 'shop:shop' %}?hash={{ user.hash_code }}" class="continue-shopping">
+                Перейти в магазин
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cartItems = document.querySelectorAll('.cart-item');
+        
+        cartItems.forEach(item => {
+            const itemId = item.dataset.itemId;
+            const quantityInput = item.querySelector('.quantity-input');
+            const decreaseBtn = item.querySelector('.decrease-qty');
+            const increaseBtn = item.querySelector('.increase-qty');
+            const removeBtn = item.querySelector('.remove-item');
+            
+            // Увеличение количества
+            increaseBtn.addEventListener('click', function() {
+                let quantity = parseInt(quantityInput.value);
+                if (quantity < 10) {
+                    quantity++;
+                    quantityInput.value = quantity;
+                    updateCartItem(itemId, quantity);
+                }
+            });
+            
+            // Уменьшение количества
+            decreaseBtn.addEventListener('click', function() {
+                let quantity = parseInt(quantityInput.value);
+                if (quantity > 1) {
+                    quantity--;
+                    quantityInput.value = quantity;
+                    updateCartItem(itemId, quantity);
+                }
+            });
+            
+            // Изменение количества вручную
+            quantityInput.addEventListener('change', function() {
+                let quantity = parseInt(this.value);
+                if (quantity < 1) {
+                    quantity = 1;
+                    this.value = 1;
+                } else if (quantity > 10) {
+                    quantity = 10;
+                    this.value = 10;
+                }
+                updateCartItem(itemId, quantity);
+            });
+            
+            // Удаление товара
+            removeBtn.addEventListener('click', function() {
+                if (confirm('Вы уверены, что хотите удалить этот товар из корзины?')) {
+                    removeFromCart(itemId);
+                }
+            });
+        });
+        
+        // Функция обновления количества товара
+        function updateCartItem(itemId, quantity) {
+            const formData = new FormData();
+            formData.append('hash', '{{ user.hash_code }}');
+            formData.append('item_id', itemId);
+            formData.append('quantity', quantity);
+            
+            fetch('{% url "shop:update_cart_item" %}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Обновляем информацию о корзине
+                    location.reload();
+                } else {
+                    alert(data.error || 'Ошибка при обновлении корзины');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ошибка при обновлении корзины');
+            });
+        }
+        
+        // Функция удаления товара из корзины
+        function removeFromCart(itemId) {
+            const formData = new FormData();
+            formData.append('hash', '{{ user.hash_code }}');
+            formData.append('item_id', itemId);
+            
+            fetch('{% url "shop:remove_from_cart" %}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Обновляем страницу
+                    location.reload();
+                } else {
+                    alert(data.error || 'Ошибка при удалении товара из корзины');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ошибка при удалении товара из корзины');
+            });
+        }
+    });
+</script>
+{% endblock %} 

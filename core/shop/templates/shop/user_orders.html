@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Мои заказы | BAITC | RedOrda{% endblock %}
+
+{% block extra_css %}
+<style>
+    .orders-container {
+        padding-bottom: 40px;
+    }
+    
+    .orders-list {
+        margin-top: 24px;
+    }
+    
+    .order-card {
+        background-color: white;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .order-number {
+        font-weight: 600;
+        font-size: 16px;
+    }
+    
+    .order-date {
+        color: #6b7280;
+        font-size: 14px;
+    }
+    
+    .order-status {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+    }
+    
+    .status-pending {
+        background-color: #fef3c7;
+        color: #d97706;
+    }
+    
+    .status-processing {
+        background-color: #e0f2fe;
+        color: #0284c7;
+    }
+    
+    .status-shipped {
+        background-color: #dcfce7;
+        color: #16a34a;
+    }
+    
+    .status-delivered {
+        background-color: #bbf7d0;
+        color: #16a34a;
+    }
+    
+    .status-cancelled {
+        background-color: #fee2e2;
+        color: #ef4444;
+    }
+    
+    .order-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .info-item {
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    .info-label {
+        font-size: 12px;
+        color: #6b7280;
+        margin-bottom: 4px;
+    }
+    
+    .info-value {
+        font-size: 14px;
+        font-weight: 600;
+    }
+    
+    .crystal-badge {
+        display: inline-flex;
+        align-items: center;
+        color: #4f46e5;
+        font-weight: 600;
+    }
+    
+    .crystal-icon {
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+    }
+    
+    .view-details {
+        display: block;
+        width: 100%;
+        padding: 8px;
+        border-radius: 6px;
+        background-color: #f3f4f6;
+        color: #4b5563;
+        font-weight: 500;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .view-details:hover {
+        background-color: #e5e7eb;
+    }
+    
+    .empty-orders {
+        text-align: center;
+        padding: 40px 0;
+    }
+    
+    .empty-orders-icon {
+        font-size: 64px;
+        color: #d1d5db;
+        margin-bottom: 16px;
+    }
+    
+    .empty-orders-text {
+        font-size: 18px;
+        color: #6b7280;
+        margin-bottom: 24px;
+    }
+    
+    .go-shopping-btn {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 8px;
+        background-color: #2563eb;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .go-shopping-btn:hover {
+        background-color: #1d4ed8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="orders-container">
+    <h1 class="text-2xl font-bold mb-4">Мои заказы</h1>
+    
+    {% if orders %}
+        <div class="orders-list">
+            {% for order in orders %}
+            <div class="order-card">
+                <div class="order-header">
+                    <div class="order-number">Заказ #{{ order.id }}</div>
+                    <div class="order-date">{{ order.created_at|date:"d.m.Y H:i" }}</div>
+                </div>
+                
+                <div class="order-info">
+                    <div class="info-item">
+                        <div class="info-label">Статус</div>
+                        <div class="info-value">
+                            <span class="order-status status-{{ order.status }}">
+                                {{ order.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Оплата</div>
+                        <div class="info-value">{{ order.get_payment_type_display }}</div>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Сумма</div>
+                        <div class="info-value">{{ order.total_price }} ₸</div>
+                    </div>
+                    
+                    {% if order.payment_type == 'crystals' %}
+                    <div class="info-item">
+                        <div class="info-label">Кристаллы</div>
+                        <div class="info-value">
+                            <span class="crystal-badge">
+                                <img src="{% static 'img/icons/crystal.png' %}" alt="Crystal" class="crystal-icon">
+                                {{ order.total_crystal_price }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <a href="{% url 'shop:order_detail' order.id %}?hash={{ user.hash_code }}" class="view-details">
+                    Подробнее
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-orders">
+            <div class="empty-orders-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                </svg>
+            </div>
+            <p class="empty-orders-text">У вас пока нет заказов</p>
+            <a href="{% url 'shop:shop' %}?hash={{ user.hash_code }}" class="go-shopping-btn">
+                Перейти в магазин
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 
