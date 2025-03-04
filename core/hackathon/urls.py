@@ -1,15 +1,20 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from . import views
 
 app_name = 'hackathon'
 
+router = DefaultRouter()
+router.register(r'hackathons', views.HackathonViewSet)
+router.register(r'tags', views.TagViewSet)
+router.register(r'prize-places', views.PrizePlacesViewSet)
+
 urlpatterns = [
-    # Главная страница хакатонов (список всех хакатонов)
+    # API endpoints
+    path('api/', include(router.urls)),
+    
+    # Web pages
     path('', views.hackathon_list, name='index'),
-    
-    # Детальная страница хакатона
     path('<int:pk>/', views.hackathon_detail, name='detail'),
-    
-    # Список хакатонов (альтернативный URL)
     path('list/', views.hackathon_list, name='list'),
 ]

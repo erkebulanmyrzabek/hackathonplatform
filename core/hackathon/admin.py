@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Hackathon, PrizePlaces
+from .models import Hackathon, PrizePlaces, Tag
 
 class PrizePlacesInline(admin.TabularInline):
     model = PrizePlaces
@@ -29,3 +29,10 @@ class PrizePlacesAdmin(admin.ModelAdmin):
     list_display = ('hackathon', 'place', 'prize_amount', 'winner')
     list_filter = ('hackathon', 'place')
     search_fields = ('hackathon__name', 'winner__username')
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ('name', 'created_at')
+    search_fields = ('name',)
+    list_filter = ('created_at',)
+

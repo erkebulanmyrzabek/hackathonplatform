@@ -27,7 +27,7 @@
                         <i class="fas fa-laptop-code"></i>
                     </div>
                 {% endif %}
-                <div class="event-type">Хакатон</div>
+                <div class="event-type">{{ hackathon.get_status_display }}</div>
             </div>
             <div class="event-info">
                 <h2 class="event-title">{{ hackathon.name }}</h2>
@@ -37,6 +37,11 @@
                 </div>
                 <div class="event-description">
                     {{ hackathon.description|truncatewords:5 }}
+                </div>
+                <div class="event-tags">
+                    {% for tag in hackathon.tags.all %}
+                        <span class="event-tag px-2 py-1 text-sm rounded-full border border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100 transition duration-200 mr-2 mb-3 inline-block">{{ tag.name }}</span>
+                    {% endfor %}
                 </div>
             </div>
         </div>
