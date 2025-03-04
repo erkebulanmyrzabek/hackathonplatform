@@ -14,7 +14,7 @@ django.setup()
 from user.models import User
 
 TOKEN = settings.TOKEN
-WEB_APP_URL = "https://b0d2-92-47-231-47.ngrok-free.app/feed"
+WEB_APP_URL = "https://41b5-185-107-174-22.ngrok-free.app/feed"
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
