@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'community',
     'hackathon',
     'rating',
+    'admin_panel',
 ]
 
 MIDDLEWARE = [
