@@ -267,8 +267,8 @@
     }
     
     .quantity-btn {
-        width: 36px;
-        height: 36px;
+        width: 24px;
+        height: 24px;
         border-radius: 50%;
         background-color: #f3f4f6;
         display: flex;
@@ -283,7 +283,7 @@
     }
     
     .quantity-input {
-        width: 50px;
+        width: 30px;
         text-align: center;
         font-weight: 600;
         border: none;
@@ -304,6 +304,179 @@
     }
     
     .add-to-cart-btn:hover {
+        background-color: #1d4ed8;
+    }
+    
+    /* Стили для модального окна корзины */
+    .cart-modal-content {
+        padding: 20px;
+    }
+    
+    .cart-item {
+        display: flex;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 16px 0;
+    }
+    
+    .item-image {
+        width: 80px;
+        height: 80px;
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: #f3f4f6;
+    }
+    
+    .item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .item-details {
+        flex: 1;
+        padding-left: 16px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .item-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+    
+    .item-variant {
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 8px;
+        line-height: 1.2;
+        word-break: break-word;
+    }
+    
+    .item-price {
+        display: flex;
+        align-items: center;
+        margin-top: auto;
+    }
+    
+    .price-money {
+        font-weight: 600;
+        color: #ef4444;
+        font-size: 0.85rem;
+    }
+    
+    .crystal-price {
+        display: flex;
+        align-items: center;
+        color: #4f46e5;
+        font-weight: 600;
+        margin-left: 8px;
+        font-size: 0.8rem;
+    }
+    
+    .item-actions {
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+    }
+    
+    .quantity-selector {
+        display: flex;
+        align-items: center;
+    }
+    
+    .quantity-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background-color: #f3f4f6;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+    
+    .quantity-btn:hover {
+        background-color: #e5e7eb;
+    }
+    
+    .quantity-input {
+        width: 40px;
+        text-align: center;
+        font-weight: 600;
+        border: none;
+        outline: none;
+    }
+    
+    .remove-item {
+        margin-left: 8px;
+        color: #6b7280;
+        transition: all 0.3s ease;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .remove-item:hover {
+        color: #ef4444;
+    }
+    
+    .cart-summary {
+        background-color: white;
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 24px;
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+    
+    .summary-label {
+        color: #6b7280;
+    }
+    
+    .summary-value {
+        font-weight: 600;
+    }
+    
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .total-label {
+        font-weight: 600;
+        font-size: 18px;
+    }
+    
+    .total-value {
+        font-weight: 700;
+        font-size: 18px;
+        color: #ef4444;
+    }
+    
+    .checkout-btn {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        background-color: #2563eb;
+        color: white;
+        font-weight: 600;
+        text-align: center;
+        margin-top: 20px;
+        transition: all 0.3s ease;
+    }
+    
+    .checkout-btn:hover {
         background-color: #1d4ed8;
     }
 </style>
@@ -354,10 +527,10 @@
                 <h3 class="product-title">{{ product.name }}</h3>
                 <div class="product-price">
                     {% if product.discount_percent > 0 %}
-                    <span class="original-price">{{ product.price }} ₸</span>
-                    <span class="discounted-price">{{ product.discounted_price }} ₸</span>
+                    <span class="original-price">{{ product.price|floatformat:"0" }} ₸</span>
+                    <span class="discounted-price">{{ product.discounted_price|floatformat:"0" }} ₸</span>
                     {% else %}
-                    <span class="discounted-price">{{ product.price }} ₸</span>
+                    <span class="discounted-price">{{ product.price|floatformat:"0" }} ₸</span>
                     {% endif %}
                     
                     {% if product.crystal_price > 0 %}
@@ -377,17 +550,57 @@
     </div>
     
     <!-- Плавающая кнопка корзины -->
-    <a href="{% if user %}{% url 'shop:cart' %}?hash={{ user.hash_code }}{% else %}#{% endif %}" class="floating-cart-button">
+    <a href="#" class="floating-cart-button" id="open-cart-btn">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l .383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
         </svg>
         <span class="cart-count">{% if cart %}{{ cart.total_items }}{% else %}0{% endif %}</span>
     </a>
-    
+
+    <!-- Модальное окно корзины -->
+    <div id="cart-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-close" id="close-cart-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </div>
+            
+            <div class="cart-modal-content">
+                <h2 class="text-xl font-bold mb-4">Корзина</h2>
+                
+                <div id="cart-items-container">
+                    <!-- Здесь будут элементы корзины, загруженные через JavaScript -->
+                </div>
+                
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span class="summary-label">Товаров (<span id="cart-items-count">0</span>)</span>
+                        <span class="summary-value" id="cart-total-price">0 ₸</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span class="summary-label">Доставка</span>
+                        <span class="summary-value">0 ₸</span>
+                    </div>
+                    
+                    <div class="total-row">
+                        <span class="total-label">Итого:</span>
+                        <span class="total-value" id="cart-final-total">0 ₸</span>
+                    </div>
+                </div>
+                
+                <a href="#" id="proceed-to-checkout" class="checkout-btn">
+                    Proceed to buy
+                </a>
+            </div>
+        </div>
+    </div>
+
     <!-- Модальное окно товара -->
     <div id="product-modal" class="modal">
         <div id="product-modal-content" class="modal-content">
-            <div class="modal-close">
+            <div class="modal-close" id="close-product-modal">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -432,6 +645,264 @@
         let selectedVariantId = null;
         let currentQuantity = 1;
         
+        // Заменяем иконку кристаллов на эмодзи
+        document.querySelectorAll('.crystal-price').forEach(el => {
+            const html = el.innerHTML;
+            el.innerHTML = html.replace(/<img[^>]*>/g, '💎 ');
+        });
+        
+        // Обработчик клика по кнопке корзины
+        document.getElementById('open-cart-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            openCartModal();
+        });
+        
+        // Обработчик клика по кнопке закрытия модального окна корзины
+        document.getElementById('close-cart-btn').addEventListener('click', function() {
+            document.getElementById('cart-modal').style.display = 'none';
+        });
+        
+        // Функция для открытия модального окна корзины
+        function openCartModal() {
+            // Загрузка содержимого корзины
+            loadCartItems();
+            
+            // Показываем модальное окно корзины
+            document.getElementById('cart-modal').style.display = 'block';
+        }
+        
+        // Функция для загрузки содержимого корзины
+        function loadCartItems() {
+            const userHash = "{% if user %}{{ user.hash_code }}{% else %}{% endif %}";
+            
+            if (!userHash) {
+                alert('Для просмотра корзины необходимо войти в систему');
+                return;
+            }
+            
+            // Показываем модальное окно корзины сразу
+            document.getElementById('cart-modal').style.display = 'block';
+            
+            // Устанавливаем сообщение о загрузке
+            document.getElementById('cart-items-container').innerHTML = '<p class="text-center py-8 text-gray-500">Загрузка корзины...</p>';
+            
+            fetch('{% url "shop:cart" %}?hash=' + userHash)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Ошибка при загрузке корзины: ' + response.status);
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    try {
+                        // Парсим HTML для извлечения данных корзины
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        
+                        // Получаем элементы корзины
+                        const cartItems = doc.querySelectorAll('.cart-item');
+                        const cartItemsContainer = document.getElementById('cart-items-container');
+                        cartItemsContainer.innerHTML = '';
+                        
+                        if (cartItems.length === 0) {
+                            cartItemsContainer.innerHTML = '<p class="text-center py-8 text-gray-500">Ваша корзина пуста</p>';
+                            document.getElementById('proceed-to-checkout').style.display = 'none';
+                            document.getElementById('cart-items-count').textContent = '0';
+                            document.getElementById('cart-total-price').textContent = '0 ₸';
+                            document.getElementById('cart-final-total').textContent = '0 ₸';
+                            return;
+                        }
+                        
+                        // Показываем кнопку оформления заказа
+                        document.getElementById('proceed-to-checkout').style.display = 'block';
+                        
+                        // Копируем элементы корзины
+                        cartItems.forEach(item => {
+                            const clone = item.cloneNode(true);
+                            
+                            // Заменяем иконку кристаллов на эмодзи
+                            const crystalPrice = clone.querySelector('.crystal-price');
+                            if (crystalPrice) {
+                                const html = crystalPrice.innerHTML;
+                                crystalPrice.innerHTML = html.replace(/<img[^>]*>/g, '💎 ');
+                            }
+                            
+                            // Уменьшаем размер цен, если они слишком большие
+                            const priceElement = clone.querySelector('.price-money');
+                            if (priceElement) {
+                                const priceText = priceElement.textContent;
+                                if (priceText.length > 10) {
+                                    priceElement.style.fontSize = '0.85rem';
+                                }
+                            }
+                            
+                            // Проверяем и улучшаем отображение вариантов товара
+                            const variantElement = clone.querySelector('.item-variant');
+                            if (variantElement) {
+                                // Убедимся, что текст вариантов отображается корректно
+                                variantElement.style.lineHeight = '1.2';
+                                variantElement.style.wordBreak = 'break-word';
+                            }
+                            
+                            cartItemsContainer.appendChild(clone);
+                        });
+                        
+                        // Обновляем счетчики и суммы
+                        let totalItems = '0';
+                        let totalPrice = '0 ₸';
+                        let finalTotal = '0 ₸';
+                        
+                        // Рассчитываем общую сумму вручную
+                        let totalQuantity = 0;
+                        let totalSum = 0;
+                        
+                        cartItems.forEach(item => {
+                            const quantityElem = item.querySelector('.quantity-input');
+                            const quantity = quantityElem ? parseInt(quantityElem.value) : 1;
+                            totalQuantity += quantity;
+                            
+                            const priceElem = item.querySelector('.price-money');
+                            if (priceElem) {
+                                const priceText = priceElem.textContent;
+                                const price = parseFloat(priceText.replace(/[^\d,]/g, '').replace(',', '.'));
+                                totalSum += price * quantity;
+                            }
+                        });
+                        
+                        totalItems = totalQuantity.toString();
+                        totalPrice = totalSum.toFixed(2).replace('.', ',') + ' ₸';
+                        finalTotal = totalPrice;
+                        
+                        document.getElementById('cart-items-count').textContent = totalItems;
+                        document.getElementById('cart-total-price').textContent = totalPrice;
+                        document.getElementById('cart-final-total').textContent = finalTotal;
+                        
+                        // Добавляем обработчики событий для кнопок
+                        setupCartItemEvents();
+                    } catch (error) {
+                        console.error('Ошибка при обработке данных корзины:', error);
+                        document.getElementById('cart-items-container').innerHTML = '<p class="text-center py-8 text-gray-500">Ошибка при загрузке корзины. Пожалуйста, попробуйте еще раз.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка при загрузке корзины:', error);
+                    document.getElementById('cart-items-container').innerHTML = '<p class="text-center py-8 text-gray-500">Ошибка при загрузке корзины. Пожалуйста, попробуйте еще раз.</p>';
+                });
+        }
+        
+        // Настройка обработчиков событий для элементов корзины
+        function setupCartItemEvents() {
+            // Обработчики для кнопок увеличения/уменьшения количества
+            document.querySelectorAll('#cart-items-container .increase-qty').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const item = this.closest('.cart-item');
+                    const itemId = item.dataset.itemId;
+                    const quantityInput = item.querySelector('.quantity-input');
+                    let quantity = parseInt(quantityInput.value);
+                    
+                    if (quantity < 10) {
+                        quantity++;
+                        quantityInput.value = quantity;
+                        updateCartItem(itemId, quantity);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('#cart-items-container .decrease-qty').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const item = this.closest('.cart-item');
+                    const itemId = item.dataset.itemId;
+                    const quantityInput = item.querySelector('.quantity-input');
+                    let quantity = parseInt(quantityInput.value);
+                    
+                    if (quantity > 1) {
+                        quantity--;
+                        quantityInput.value = quantity;
+                        updateCartItem(itemId, quantity);
+                    }
+                });
+            });
+            
+            // Обработчики для кнопок удаления товара
+            document.querySelectorAll('#cart-items-container .remove-item').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const item = this.closest('.cart-item');
+                    const itemId = item.dataset.itemId;
+                    
+                    if (confirm('Вы уверены, что хотите удалить этот товар из корзины?')) {
+                        removeFromCart(itemId);
+                    }
+                });
+            });
+        }
+        
+        // Функция обновления количества товара
+        function updateCartItem(itemId, quantity) {
+            const userHash = "{% if user %}{{ user.hash_code }}{% else %}{% endif %}";
+            const formData = new FormData();
+            formData.append('hash', userHash);
+            formData.append('item_id', itemId);
+            formData.append('quantity', quantity);
+            
+            fetch('{% url "shop:update_cart_item" %}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Обновляем информацию о корзине
+                    loadCartItems();
+                } else {
+                    alert(data.error || 'Ошибка при обновлении корзины');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ошибка при обновлении корзины');
+            });
+        }
+        
+        // Функция удаления товара из корзины
+        function removeFromCart(itemId) {
+            const userHash = "{% if user %}{{ user.hash_code }}{% else %}{% endif %}";
+            const formData = new FormData();
+            formData.append('hash', userHash);
+            formData.append('item_id', itemId);
+            
+            fetch('{% url "shop:remove_from_cart" %}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Обновляем информацию о корзине
+                    loadCartItems();
+                    
+                    // Обновляем счетчик товаров в корзине
+                    const cartCountElem = document.querySelector('.cart-count');
+                    if (cartCountElem) {
+                        const newCount = parseInt(cartCountElem.textContent) - 1;
+                        cartCountElem.textContent = newCount > 0 ? newCount : 0;
+                    }
+                } else {
+                    alert(data.error || 'Ошибка при удалении товара из корзины');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ошибка при удалении товара из корзины');
+            });
+        }
+        
+        // Обработчик клика по кнопке оформления заказа
+        document.getElementById('proceed-to-checkout').addEventListener('click', function(e) {
+            e.preventDefault();
+            const userHash = "{% if user %}{{ user.hash_code }}{% else %}{% endif %}";
+            window.location.href = '{% url "shop:checkout" %}?hash=' + userHash;
+        });
+        
         // Открытие модального окна при клике на карточку товара
         productCards.forEach(card => {
             card.addEventListener('click', function() {
@@ -442,6 +913,11 @@
         
         // Закрытие модального окна
         modalClose.addEventListener('click', function() {
+            closeProductModal();
+        });
+        
+        // Добавляем обработчик для кнопки закрытия модального окна товара
+        document.getElementById('close-product-modal').addEventListener('click', function() {
             closeProductModal();
         });
         
@@ -596,7 +1072,7 @@
             // Отображаем цену в кристаллах
             let crystalHtml = '';
             if (product.crystal_price > 0) {
-                crystalHtml = `<img src="{% static 'img/icons/crystal.png' %}" alt="Crystal" class="crystal-icon"><span>${product.discounted_crystal_price}</span>`;
+                crystalHtml = `💎 ${product.discounted_crystal_price}`;
             }
             document.getElementById('product-modal-crystal').innerHTML = crystalHtml;
             
@@ -604,7 +1080,7 @@
             const variantOptions = document.getElementById('variant-options');
             variantOptions.innerHTML = '';
             
-            if (product.variants) {
+            if (product.variants && Object.keys(product.variants).length > 0) {
                 for (const [type, options] of Object.entries(product.variants)) {
                     // Создаем заголовок типа варианта
                     const variantType = document.createElement('span');

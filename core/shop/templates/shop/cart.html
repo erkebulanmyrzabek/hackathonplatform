@@ -46,17 +46,21 @@
         font-size: 14px;
         color: #6b7280;
         margin-bottom: 8px;
+        line-height: 1.2;
+        word-break: break-word;
     }
     
     .item-price {
         display: flex;
         align-items: center;
         margin-top: auto;
+        flex-wrap: wrap;
     }
     
     .price-money {
         font-weight: 600;
         color: #ef4444;
+        font-size: 0.85rem;
     }
     
     .crystal-price {
@@ -64,7 +68,8 @@
         align-items: center;
         color: #4f46e5;
         font-weight: 600;
-        margin-left: 12px;
+        margin-left: 8px;
+        font-size: 0.8rem;
     }
     
     .crystal-icon {
@@ -85,8 +90,8 @@
     }
     
     .quantity-btn {
-        width: 28px;
-        height: 28px;
+        width: 24px;
+        height: 24px;
         border-radius: 50%;
         background-color: #f3f4f6;
         display: flex;
@@ -101,7 +106,7 @@
     }
     
     .quantity-input {
-        width: 40px;
+        width: 30px;
         text-align: center;
         font-weight: 600;
         border: none;
@@ -109,9 +114,14 @@
     }
     
     .remove-item {
-        margin-left: 12px;
+        margin-left: 8px;
         color: #6b7280;
         transition: all 0.3s ease;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .remove-item:hover {
@@ -224,15 +234,20 @@
                     <h3 class="item-title">{{ item.product.name }}</h3>
                     {% if item.variant %}
                     <div class="item-variant">
-                        {{ item.variant.variant_type|capfirst }}: {{ item.variant.value }}
+                        {% if item.full_variant_display %}
+                            {{ item.full_variant_display }}
+                        {% elif item.variant_display %}
+                            {{ item.variant_display }}
+                        {% else %}
+                            {{ item.variant.variant_type|capfirst }}: {{ item.variant.value }}
+                        {% endif %}
                     </div>
                     {% endif %}
                     <div class="item-price">
-                        <span class="price-money">{{ item.product.discounted_price }} ₸</span>
+                        <span class="price-money">{{ item.product.discounted_price|floatformat:"0" }} ₸</span>
                         {% if item.product.crystal_price > 0 %}
                         <span class="crystal-price">
-                            <img src="{% static 'img/icons/crystal.png' %}" alt="Crystal" class="crystal-icon">
-                            {{ item.product.discounted_crystal_price }}
+                            💎 {{ item.product.discounted_crystal_price }}
                         </span>
                         {% endif %}
                     </div>
@@ -244,7 +259,7 @@
                         <button class="quantity-btn increase-qty">+</button>
                     </div>
                     <button class="remove-item">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                         </svg>
                     </button>
@@ -255,23 +270,22 @@
         
         <div class="cart-summary">
             <div class="summary-row">
-                <span class="summary-label">Товаров ({{ cart.total_items }})</span>
-                <span class="summary-value">{{ cart.total_price }} ₸</span>
+                <span class="summary-label">Товаров ({{ cart.total_items|floatformat:"0" }})</span>
+                <span class="summary-value">{{ cart.total_price|floatformat:"0" }} ₸</span>
             </div>
             {% if cart.total_crystal_price > 0 %}
             <div class="summary-row">
                 <span class="summary-label">Кристаллы</span>
                 <span class="summary-value">
                     <span class="crystal-price">
-                        <img src="{% static 'img/icons/crystal.png' %}" alt="Crystal" class="crystal-icon">
-                        {{ cart.total_crystal_price }}
+                        💎 {{ cart.total_crystal_price }}
                     </span>
                 </span>
             </div>
             {% endif %}
             <div class="total-row">
                 <span class="total-label">Итого:</span>
-                <span class="total-value">{{ cart.total_price }} ₸</span>
+                <span class="total-value">{{ cart.total_price|floatformat:"0" }} ₸</span>
             </div>
             
             <a href="{% url 'shop:checkout' %}?hash={{ user.hash_code }}" class="checkout-btn">

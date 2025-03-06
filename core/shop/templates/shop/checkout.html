@@ -27,70 +27,6 @@
         justify-content: space-between;
     }
     
-    .toggle-items {
-        font-size: 14px;
-        color: #6b7280;
-        cursor: pointer;
-    }
-    
-    .order-items {
-        display: none;
-        margin-bottom: 16px;
-    }
-    
-    .order-items.show {
-        display: block;
-    }
-    
-    .order-item {
-        display: flex;
-        padding: 8px 0;
-        border-bottom: 1px solid #f3f4f6;
-    }
-    
-    .order-item-image {
-        width: 60px;
-        height: 60px;
-        border-radius: 6px;
-        overflow: hidden;
-        background-color: #f3f4f6;
-    }
-    
-    .order-item-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    
-    .order-item-details {
-        flex: 1;
-        padding-left: 12px;
-    }
-    
-    .order-item-title {
-        font-weight: 600;
-        margin-bottom: 2px;
-        font-size: 14px;
-    }
-    
-    .order-item-variant {
-        font-size: 12px;
-        color: #6b7280;
-    }
-    
-    .order-item-price {
-        display: flex;
-        align-items: center;
-        font-size: 14px;
-        margin-top: 4px;
-    }
-    
-    .order-item-quantity {
-        margin-left: auto;
-        color: #6b7280;
-        font-size: 14px;
-    }
-    
     .summary-row {
         display: flex;
         justify-content: space-between;
@@ -246,6 +182,30 @@
         margin-top: 4px;
     }
     
+    /* Переключатель способа оплаты */
+    .payment-toggle {
+        display: flex;
+        background-color: #f3f4f6;
+        border-radius: 8px;
+        padding: 4px;
+        margin-bottom: 16px;
+    }
+    
+    .payment-toggle-option {
+        flex: 1;
+        text-align: center;
+        padding: 10px;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .payment-toggle-option.active {
+        background-color: #2563eb;
+        color: white;
+    }
+    
     /* Анимация загрузки */
     .spinner {
         display: inline-block;
@@ -272,32 +232,11 @@
     <div class="order-summary">
         <div class="order-summary-title">
             <span>Ваш заказ</span>
-            <span class="toggle-items" id="toggle-items">Показать товары</span>
-        </div>
-        
-        <div class="order-items" id="order-items">
-            {% for item in cart_items %}
-            <div class="order-item">
-                <div class="order-item-image">
-                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
-                </div>
-                <div class="order-item-details">
-                    <h3 class="order-item-title">{{ item.product.name }}</h3>
-                    {% if item.variant %}
-                    <div class="order-item-variant">{{ item.variant.variant_type|capfirst }}: {{ item.variant.value }}</div>
-                    {% endif %}
-                    <div class="order-item-price">
-                        <span>{{ item.product.discounted_price }} ₸</span>
-                        <span class="order-item-quantity">x{{ item.quantity }}</span>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
         </div>
         
         <div class="summary-row">
             <span class="summary-label">Товаров ({{ cart.total_items }})</span>
-            <span class="summary-value">{{ cart.total_price }} ₸</span>
+            <span class="summary-value">{{ cart.total_price|floatformat:"0" }} ₸</span>
         </div>
         
         {% if cart.total_crystal_price > 0 %}
@@ -305,8 +244,7 @@
             <span class="summary-label">Кристаллы</span>
             <span class="summary-value">
                 <span class="crystal-price">
-                    <img src="{% static 'img/icons/crystal.png' %}" alt="Crystal" class="crystal-icon" style="width: 16px; height: 16px; margin-right: 4px;">
-                    {{ cart.total_crystal_price }}
+                    💎 {{ cart.total_crystal_price }}
                 </span>
             </span>
         </div>
@@ -319,11 +257,21 @@
         
         <div class="total-row">
             <span class="total-label">Итого:</span>
-            <span class="total-value">{{ cart.total_price }} ₸</span>
+            <span class="total-value" id="total-price-display">{{ cart.total_price|floatformat:"0" }} ₸</span>
         </div>
     </div>
     
     <form id="checkout-form">
+        <!-- Переключатель способа оплаты -->
+        <div class="payment-toggle">
+            <div class="payment-toggle-option active" data-payment="cash" id="money-payment">
+                Деньги
+            </div>
+            <div class="payment-toggle-option" data-payment="crystals" id="crystal-payment">
+                Кристаллы 💎 {{ cart.total_crystal_price }}
+            </div>
+        </div>
+        
         <!-- Информация о покупателе -->
         <div class="customer-info">
             <h2 class="form-title">Информация для доставки</h2>
@@ -341,12 +289,6 @@
             </div>
             
             <div class="form-group">
-                <label for="email" class="form-label">Email*</label>
-                <input type="email" id="email" name="email" class="form-input" required>
-                <div class="error-message" id="email-error"></div>
-            </div>
-            
-            <div class="form-group">
                 <label for="city" class="form-label">Город*</label>
                 <input type="text" id="city" name="city" class="form-input" required>
                 <div class="error-message" id="city-error"></div>
@@ -359,46 +301,8 @@
             </div>
             
             <div class="form-group">
-                <label for="postal-code" class="form-label">Почтовый индекс</label>
-                <input type="text" id="postal-code" name="postal_code" class="form-input">
-            </div>
-            
-            <div class="form-group">
                 <label for="notes" class="form-label">Примечания к заказу</label>
                 <textarea id="notes" name="notes" class="form-input" rows="3"></textarea>
-            </div>
-        </div>
-        
-        <!-- Способы оплаты -->
-        <div class="payment-methods">
-            <h2 class="form-title">Способ оплаты</h2>
-            
-            <div class="payment-option selected" data-payment="cash">
-                <input type="radio" name="payment_type" value="cash" class="payment-radio" checked>
-                <div>
-                    <div class="payment-label">Наличными при получении</div>
-                    <div class="payment-label-sub">Оплата наличными курьеру при получении</div>
-                </div>
-            </div>
-            
-            <div class="payment-option" data-payment="card">
-                <input type="radio" name="payment_type" value="card" class="payment-radio">
-                <div>
-                    <div class="payment-label">Банковской картой онлайн</div>
-                    <div class="payment-label-sub">Visa, MasterCard, МИР</div>
-                </div>
-            </div>
-            
-            <div class="payment-option" data-payment="crystals">
-                <input type="radio" name="payment_type" value="crystals" class="payment-radio">
-                <div>
-                    <div class="payment-label">Оплата кристаллами</div>
-                    <div class="payment-label-sub">Списание кристаллов с вашего баланса</div>
-                </div>
-                <div class="crystal-balance">
-                    <img src="{% static 'img/icons/crystal.png' %}" alt="Crystal" class="crystal-icon" style="width: 16px; height: 16px; margin-right: 4px;">
-                    {{ user.crystals|default:0 }}
-                </div>
             </div>
         </div>
         
@@ -412,35 +316,34 @@
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Переключение отображения товаров
-        const toggleItems = document.getElementById('toggle-items');
-        const orderItems = document.getElementById('order-items');
+        // Переключение способа оплаты
+        const moneyPayment = document.getElementById('money-payment');
+        const crystalPayment = document.getElementById('crystal-payment');
+        const totalPriceDisplay = document.getElementById('total-price-display');
         
-        toggleItems.addEventListener('click', function() {
-            if (orderItems.classList.contains('show')) {
-                orderItems.classList.remove('show');
-                toggleItems.textContent = 'Показать товары';
-            } else {
-                orderItems.classList.add('show');
-                toggleItems.textContent = 'Скрыть товары';
-            }
+        let selectedPaymentType = 'cash';
+        
+        moneyPayment.addEventListener('click', function() {
+            moneyPayment.classList.add('active');
+            crystalPayment.classList.remove('active');
+            selectedPaymentType = 'cash';
+            totalPriceDisplay.textContent = '{{ cart.total_price|floatformat:"0" }} ₸';
         });
         
-        // Переключение способа оплаты
-        const paymentOptions = document.querySelectorAll('.payment-option');
-        
-        paymentOptions.forEach(option => {
-            option.addEventListener('click', function() {
-                // Снимаем выделение со всех опций
-                paymentOptions.forEach(opt => {
-                    opt.classList.remove('selected');
-                    opt.querySelector('input[type="radio"]').checked = false;
-                });
-                
-                // Выделяем выбранную опцию
-                this.classList.add('selected');
-                this.querySelector('input[type="radio"]').checked = true;
-            });
+        crystalPayment.addEventListener('click', function() {
+            crystalPayment.classList.add('active');
+            moneyPayment.classList.remove('active');
+            selectedPaymentType = 'crystals';
+            totalPriceDisplay.textContent = '💎 {{ cart.total_crystal_price }}';
+            
+            // Проверяем, хватает ли кристаллов
+            const userCrystals = parseInt('{{ user.coin|default:0 }}');
+            const cartCrystals = parseInt('{{ cart.total_crystal_price }}');
+            
+            if (userCrystals < cartCrystals) {
+                alert('У вас недостаточно кристаллов для оплаты заказа');
+                moneyPayment.click();
+            }
         });
         
         // Валидация и отправка формы
@@ -458,13 +361,9 @@
                 placeOrderBtn.disabled = true;
                 placeOrderBtn.innerHTML = '<span class="spinner"></span> Оформление заказа...';
                 
-                // Получаем выбранный способ оплаты
-                const selectedPayment = document.querySelector('.payment-option.selected');
-                const paymentType = selectedPayment.dataset.payment;
-                
                 // Проверяем, хватает ли кристаллов при оплате кристаллами
-                if (paymentType === 'crystals') {
-                    const userCrystals = parseInt('{{ user.crystals|default:0 }}');
+                if (selectedPaymentType === 'crystals') {
+                    const userCrystals = parseInt('{{ user.coin|default:0 }}');
                     const cartCrystals = parseInt('{{ cart.total_crystal_price }}');
                     
                     if (userCrystals < cartCrystals) {
@@ -475,10 +374,15 @@
                     }
                 }
                 
-                // Формируем данные для отправки
-                const formData = new FormData(checkoutForm);
+                // Собираем данные формы
+                const formData = new FormData();
                 formData.append('hash', '{{ user.hash_code }}');
-                formData.append('payment_type', paymentType);
+                formData.append('full_name', document.getElementById('full-name').value.trim());
+                formData.append('phone_number', document.getElementById('phone').value.trim());
+                formData.append('city', document.getElementById('city').value.trim());
+                formData.append('address', document.getElementById('address').value.trim());
+                formData.append('notes', document.getElementById('notes').value.trim());
+                formData.append('payment_type', selectedPaymentType);
                 
                 // Отправляем запрос на оформление заказа
                 fetch('{% url "shop:place_order" %}', {
@@ -488,8 +392,8 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Переходим на страницу успешного оформления заказа
-                        window.location.href = '{% url "shop:order_success" %}?hash={{ user.hash_code }}&order_id=' + data.order_id;
+                        // Показываем модальное окно успешного оформления заказа
+                        showOrderSuccessModal(data.order_id);
                     } else {
                         alert(data.error || 'Ошибка при оформлении заказа');
                         placeOrderBtn.disabled = false;
@@ -509,7 +413,6 @@
             // Получаем все обязательные поля
             const fullName = document.getElementById('full-name');
             const phone = document.getElementById('phone');
-            const email = document.getElementById('email');
             const city = document.getElementById('city');
             const address = document.getElementById('address');
             
@@ -525,22 +428,12 @@
                 document.getElementById('full-name-error').textContent = 'Пожалуйста, укажите ФИО';
                 isValid = false;
             }
-            
             // Проверяем телефон
             if (!phone.value.trim()) {
                 document.getElementById('phone-error').textContent = 'Пожалуйста, укажите телефон';
                 isValid = false;
             } else if (!/^[\d\+\-\(\) ]+$/.test(phone.value.trim())) {
                 document.getElementById('phone-error').textContent = 'Пожалуйста, укажите корректный номер телефона';
-                isValid = false;
-            }
-            
-            // Проверяем email
-            if (!email.value.trim()) {
-                document.getElementById('email-error').textContent = 'Пожалуйста, укажите email';
-                isValid = false;
-            } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email.value.trim())) {
-                document.getElementById('email-error').textContent = 'Пожалуйста, укажите корректный email';
                 isValid = false;
             }
             
@@ -558,6 +451,76 @@
             
             return isValid;
         }
+        
+        // Функция для отображения модального окна успешного оформления заказа
+        function showOrderSuccessModal(orderId) {
+            // Создаем модальное окно
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'block';
+            
+            const modalContent = document.createElement('div');
+            modalContent.className = 'modal-content';
+            modalContent.style.textAlign = 'center';
+            modalContent.style.padding = '30px';
+            
+            // Добавляем содержимое модального окна
+            modalContent.innerHTML = `
+                <div style="width: 80px; height: 80px; background-color: #10b981; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 24px; color: white;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-10 h-10">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                </div>
+                
+                <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 16px; color: #10b981;">Заказ успешно оформлен!</h2>
+                
+                <p style="font-size: 16px; color: #6b7280; margin-bottom: 32px;">
+                    Спасибо за ваш заказ. Мы уже приступили к его обработке. 
+                    ${selectedPaymentType === 'crystals' ? 'Кристаллы были успешно списаны с вашего баланса.' : 'Вы получите электронное письмо с подтверждением заказа.'}
+                </p>
+                
+                <div style="background-color: white; border-radius: 12px; padding: 24px; max-width: 500px; margin: 0 auto 32px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); text-align: left;">
+                    <div style="font-weight: 600; font-size: 18px; margin-bottom: 16px; display: flex; justify-content: space-between;">
+                        <span>Информация о заказе</span>
+                        <span style="color: #6b7280; font-weight: normal;">#${orderId}</span>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+                        <span style="color: #6b7280;">Дата заказа:</span>
+                        <span>${new Date().toLocaleString()}</span>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+                        <span style="color: #6b7280;">Статус:</span>
+                        <span>Ожидает обработки</span>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+                        <span style="color: #6b7280;">Способ оплаты:</span>
+                        <span>${selectedPaymentType === 'cash' ? 'Наличными при получении' : 'Кристаллы'}</span>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+                        <span style="color: #6b7280;">Стоимость заказа:</span>
+                        <span>${selectedPaymentType === 'cash' ? '{{ cart.total_price|floatformat:"0" }} ₸' : '💎 {{ cart.total_crystal_price }}'}</span>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 16px; justify-content: center;">
+                    <a href="{% url 'shop:shop' %}?hash={{ user.hash_code }}" style="padding: 12px 24px; border-radius: 8px; background-color: #2563eb; color: white; font-weight: 600; transition: all 0.3s ease;">
+                        Вернуться в магазин
+                    </a>
+                </div>
+            `;
+            
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            // Перенаправляем на страницу магазина через 5 секунд
+            setTimeout(function() {
+                window.location.href = '{% url "shop:shop" %}?hash={{ user.hash_code }}';
+            }, 5000);
+        }
     });
 </script>
-{% endblock %} 
+{% endblock %}

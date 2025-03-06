@@ -152,4 +152,10 @@ CACHES = {
 }
 
 # Telegram Bot settings
-TOKEN = '7960542844:AAH2nSW1Zq7BH24OnRcgoepI8jX2LQ8e-Gg'
+TOKEN = '8178295077:AAHHYgHXgovnoPrnp_tsplwReExCgh6Rv_o'
+
+# CSRF trusted origins
+CSRF_TRUSTED_ORIGINS = [
+    'https://c92e-37-150-2-168.ngrok-free.app',
+    'https://*.ngrok-free.app',  # Чтобы работало с любыми поддоменами ngrok
+]

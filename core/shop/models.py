@@ -141,12 +141,12 @@ class Order(models.Model):
     ]
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders', verbose_name="Пользователь")
-    full_name = models.CharField(max_length=100, verbose_name="ФИО")
+    full_name = models.CharField(max_length=255, verbose_name="ФИО")
     phone_number = models.CharField(max_length=20, verbose_name="Номер телефона")
-    email = models.EmailField(verbose_name="Email")
+    email = models.EmailField(blank=True, null=True, verbose_name="Email")
     address = models.TextField(verbose_name="Адрес доставки")
     city = models.CharField(max_length=100, verbose_name="Город")
-    postal_code = models.CharField(max_length=20, verbose_name="Почтовый индекс")
+    postal_code = models.CharField(max_length=20, blank=True, null=True, verbose_name="Почтовый индекс")
     country = models.CharField(max_length=100, default="Казахстан", verbose_name="Страна")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', verbose_name="Статус")
     payment_type = models.CharField(max_length=20, choices=PAYMENT_TYPE_CHOICES, default='cash', verbose_name="Способ оплаты")
